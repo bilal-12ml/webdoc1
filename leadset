@@ -1,0 +1,91 @@
+import pandas as pd
+import os
+
+                               #filepath reading files
+
+csv_file =r''
+
+text_file= r''
+
+csv_data = pd.read_csv(csv_file,dtype=str)
+
+text_data = pd.read_csv(text_file,dtype=str,delimiter= '|')
+
+
+
+                            # filter the data by partner
+
+filtered_csv = filtered_csv[filtered_csv["Sub_Dt_Sybrid"] > "2025-01-14"]
+
+
+                          #filter the data with date
+
+  
+filtered_csv = filtered_csv[filtered_csv["Sub_Dt_Sybrid"] > "2025-01-14"]
+
+
+
+                         #filter the data with drop the table 
+
+  filtered_csv=filtered_csv.drop(columns=['NoOfRecords'])
+
+
+
+                        #merged the two files on the basis of cellno
+
+  merged_data = pd.merge(filtered_csv, text_data, on="cellno", how="inner")
+
+
+                        #all csv files in folderpath 
+
+  folder_path = r""
+
+                       #dataframe 
+
+      dataframes = []
+
+
+
+                       #checking the multiples files in folder path and if all have csv files
+
+  # Step 1: Loop through each file in the folder
+for file_name in os.listdir(folder_path):
+    if file_name.endswith(".csv"):  # Check if it's a CSV file
+        file_path = os.path.join(folder_path, file_name)
+        df = pd.read_csv(file_path,dtype=str)  # Read the file
+        dataframes.append(df)                                                                     # Add it to the list
+
+
+
+                                                    #combined all the files in one files 
+
+  combined_data = pd.concat(dataframes, ignore_index=True)
+
+                                                  #drop the 0 from start
+  
+  combined_data['cellno']=combined_data['cellno'].str.lstrip('0')
+
+                                                  # merged with result files
+
+  final_merged=pd.merge(merged_data,combined_data, on=["cellno","product"], how="inner")
+
+
+                                                 #counts filter
+
+  final_merged['Sub_Dt_Sybrid'].value_counts()
+
+                                                #check filter on the date sub and date
+
+  final_merged['check']=final_merged['date']>=final_merged['Sub_Dt_Sybrid']
+
+
+                                               #to make the date in format 
+
+  final_merged['date'] = pd.to_datetime(final_merged['date'], format='mixed') 
+
+                                                 #to make the output file
+
+  final_output_file = r".xlsx"
+final_merged.to_excel(final_output_file, index=False)
+  
+  
